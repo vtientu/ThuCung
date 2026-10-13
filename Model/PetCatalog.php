@@ -1,24 +1,64 @@
 <?php
-/** Danh mục mẫu dùng chung cho giao diện và giỏ hàng. */
+require_once __DIR__ . '/Database.php';
+
 function pet_products(): array
 {
-    return [
-        ['id' => 1, 'name' => 'Hạt dinh dưỡng cho mèo', 'brand' => 'MOCHI NUTRITION', 'category' => 'food', 'pet' => 'cat', 'price' => 185000, 'old' => 220000, 'image' => 'food', 'color' => 'peach', 'badge' => 'Bán chạy', 'description' => 'Công thức cá hồi và rau củ, dành cho mèo trưởng thành. Túi 1 kg, tiện lợi cho bữa ăn hằng ngày.'],
-        ['id' => 2, 'name' => 'Bát ăn gốm Pastel', 'brand' => 'MOCHI HOME', 'category' => 'accessories', 'pet' => 'all', 'price' => 129000, 'old' => 0, 'image' => 'bowl', 'color' => 'green', 'badge' => '', 'description' => 'Bát gốm tráng men màu xanh sage, dung tích 400 ml. Đế rộng vững chãi, dễ vệ sinh sau mỗi bữa ăn.'],
-        ['id' => 3, 'name' => 'Đồ chơi xương mềm', 'brand' => 'MOCHI PLAY', 'category' => 'toys', 'pet' => 'dog', 'price' => 89000, 'old' => 110000, 'image' => 'bone', 'color' => 'yellow', 'badge' => '-19%', 'description' => 'Đồ chơi vải mềm hình khúc xương, dài 22 cm. Một người bạn nhỏ cho những giờ chơi cùng cún. Giám sát thú cưng khi sử dụng.'],
-        ['id' => 4, 'name' => 'Vòng cổ Everyday', 'brand' => 'MOCHI WALK', 'category' => 'accessories', 'pet' => 'dog', 'price' => 159000, 'old' => 0, 'image' => 'collar', 'color' => 'pink', 'badge' => 'Mới', 'description' => 'Vòng cổ màu đất nung với khóa kim loại. Kích thước điều chỉnh 25–40 cm, phù hợp cho những chuyến đi dạo mỗi ngày.'],
-        ['id' => 5, 'name' => 'Nệm êm Cloud Bed', 'brand' => 'MOCHI HOME', 'category' => 'beds', 'pet' => 'all', 'price' => 349000, 'old' => 420000, 'image' => 'bed', 'color' => 'peach', 'badge' => '-17%', 'description' => 'Chiếc nệm tròn mềm mại đường kính 55 cm. Vỏ tháo rời để giặt, góc nghỉ ngơi ấm áp dành riêng cho bé.'],
-        ['id' => 6, 'name' => 'Sữa tắm dịu nhẹ Oat', 'brand' => 'MOCHI CARE', 'category' => 'care', 'pet' => 'all', 'price' => 145000, 'old' => 0, 'image' => 'shampoo', 'color' => 'green', 'badge' => '', 'description' => 'Sữa tắm hương yến mạch nhẹ nhàng, chai 300 ml. Dành cho chó và mèo; tránh tiếp xúc với mắt và rửa sạch sau khi dùng.'],
-        ['id' => 7, 'name' => 'Cần câu lông vũ', 'brand' => 'MOCHI PLAY', 'category' => 'toys', 'pet' => 'cat', 'price' => 65000, 'old' => 0, 'image' => 'feather', 'color' => 'pink', 'badge' => '', 'description' => 'Cần câu đồ chơi với lông vũ và chuông nhỏ. Cùng bé vận động và tạo thêm những khoảnh khắc vui vẻ.'],
-        ['id' => 8, 'name' => 'Snack thưởng cho cún', 'brand' => 'MOCHI NUTRITION', 'category' => 'food', 'pet' => 'dog', 'price' => 79000, 'old' => 95000, 'image' => 'snack', 'color' => 'yellow', 'badge' => '-17%', 'description' => 'Snack thưởng vị gà, túi 100 g. Dùng làm phần thưởng khi huấn luyện, bổ sung bên cạnh chế độ ăn chính.'],
-    ];
+    return query_db('SELECT p.*, c.slug AS category FROM products p JOIN categories c ON c.id = p.category_id WHERE p.active = 1 AND c.active = 1 ORDER BY p.id')->fetchAll();
 }
-function pet_product(int $id): ?array
+
+function pet_product(int $id, bool $lock = false): ?array
 {
-    foreach (pet_products() as $product) {
-        if ($product['id'] === $id) { return $product; }
-    }
-    return null;
+    $sql = 'SELECT p.*, c.slug AS category FROM products p JOIN categories c ON c.id = p.category_id WHERE p.id = ? AND p.active = 1 AND c.active = 1';
+    $product = query_db($sql . ($lock ? ' FOR UPDATE' : ''), [$id])->fetch();
+    return $product ?: null;
 }
-function h($value): string { return htmlspecialchars((string) $value, ENT_QUOTES, 'UTF-8'); }
-function money($value): string { return number_format((float) $value, 0, ',', '.') . ' ₫'; }
+
+function pet_categories(): array
+{
+    return query_db('SELECT * FROM categories WHERE active = 1 ORDER BY id')->fetchAll();
+}
+
+function category_labels(): array
+{
+    $labels = ['all' => 'Tất cả'];
+    foreach (pet_categories() as $category) {
+        $labels[$category['slug']] = $category['name'];
+    }
+    return $labels;
+}
+
+function product_image(array $product): string
+{
+    $image = (string) $product['image'];
+    if (preg_match('/^pet-[a-f0-9]{32}\.(jpg|png|webp)$/', $image)) {
+        return 'Upload/' . $image;
+    }
+    $allowed = ['food', 'bowl', 'bone', 'collar', 'bed', 'shampoo', 'feather', 'snack'];
+    return 'assets/images/' . (in_array($image, $allowed, true) ? $image : 'food') . '.svg';
+}
+
+function h($value): string
+{
+    return htmlspecialchars((string) $value, ENT_QUOTES, 'UTF-8');
+}
+
+function money($value): string
+{
+    return number_format((float) $value, 0, ',', '.') . ' ₫';
+}
+
+function text_length(string $value): int
+{
+    return (int) preg_match_all('/./us', $value);
+}
+
+function search_products(string $category, string $pet, string $search, string $sort): array
+{
+    $where = ['p.active = 1', 'c.active = 1'];
+    $parameters = [];
+    if ($category !== 'all') { $where[] = 'c.slug = ?'; $parameters[] = $category; }
+    if ($pet !== 'all') { $where[] = "(p.pet = ? OR p.pet = 'all')"; $parameters[] = $pet; }
+    if ($search !== '') { $where[] = '(p.name LIKE ? OR p.brand LIKE ?)'; $parameters[] = '%' . $search . '%'; $parameters[] = '%' . $search . '%'; }
+    $order = ['price-asc' => 'p.price ASC, p.id ASC', 'price-desc' => 'p.price DESC, p.id ASC'][$sort] ?? 'p.id ASC';
+    return query_db('SELECT p.*, c.slug AS category FROM products p JOIN categories c ON c.id=p.category_id WHERE ' . implode(' AND ', $where) . ' ORDER BY ' . $order, $parameters)->fetchAll();
+}

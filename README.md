@@ -1,53 +1,102 @@
-# Mochi Pet — PHP MVC / XAMPP
+# Mochi Pet Club — PHP MVC + MySQL
 
-Cửa hàng đồ thú cưng ưu tiên giao diện: tông kem, cam đất và xanh sage; ảnh hero riêng, minh họa sản phẩm đồng bộ; responsive cho desktop và điện thoại. Font và ảnh có sẵn trong dự án, không cần Internet khi chạy.
+Cửa hàng đồ thú cưng với giao diện editorial xanh đậm/lime/pastel, hoạt động trên XAMPP và shared hosting InfinityFree. Sản phẩm, danh mục, tài khoản, giỏ hàng, đơn và chi tiết đơn đều dùng **cùng một MySQL database**. Không còn chế độ dữ liệu mẫu chạy độc lập hoặc lưu đơn bằng file.
 
-## Chạy trên XAMPP
+## Chức năng
 
-1. Dùng XAMPP với PHP 8.0 trở lên (khuyến nghị 8.2).
-2. Chép toàn bộ thư mục `ThuCung` vào `C:\xampp\htdocs\`.
-3. Mở XAMPP Control Panel, bật **Apache**.
-4. Truy cập `http://localhost/ThuCung/` trên máy của bạn.
+- Cửa hàng: tìm kiếm Unicode, lọc danh mục/chó/mèo, sắp xếp giá, xem chi tiết và tồn kho.
+- Navbar chọn đúng Trang chủ / Cửa hàng / Cho cún / Cho mèo / Về Mochi.
+- Tài khoản: đăng ký, đăng nhập, đăng xuất bằng POST, sửa hồ sơ, đổi mật khẩu, lịch sử và chi tiết đơn của riêng khách.
+- Giỏ hàng: lưu MySQL cho cả khách vãng lai và thành viên; gộp giỏ khi đăng nhập; giỏ thành viên giữ qua lần đăng nhập sau.
+- Đặt COD: tính giá ở máy chủ, lưu tên/giá sản phẩm tại thời điểm mua, ghi đơn + chi tiết + trừ kho + xóa giỏ trong một transaction. Gửi lại cùng form không tạo đơn trùng.
+- Admin: thống kê, thêm/sửa/ẩn sản phẩm, tải ảnh JPG/PNG/WebP, chỉnh tồn kho, quản lý danh mục, xem đơn/chi tiết, chuyển trạng thái và khóa/mở khách hàng.
+- Luồng đơn: Chờ xử lý → Đã xác nhận → Đang giao → Đã giao. Chỉ hủy trước khi giao; hủy đơn hoàn tồn kho đúng một lần.
+- PDO prepared statements, utf8mb4, password_hash/password_verify, CSRF, kiểm tra quyền admin, giới hạn thử mật khẩu, kiểm tra nội dung ảnh và tên file ngẫu nhiên.
+- Giao hàng 30.000 đ, miễn phí từ 399.000 đ. Ảnh và font có sẵn, không cần CDN.
 
-Cửa hàng mới không cần MySQL hoặc Composer. Đảm bảo Apache có quyền ghi thư mục `storage/` để lưu đơn. Có thể dùng tên thư mục khác; tất cả liên kết của cửa hàng dùng đường dẫn tương đối.
+Yêu cầu PHP **8.0+**, extension **PDO MySQL**, MySQL **5.7+** hoặc MariaDB **10.4+**, bảng InnoDB. Thời gian ứng dụng hiển thị theo Việt Nam (UTC+7). Không cần Node, Composer hay cron để chạy web.
 
-## Các chức năng đã có
+## XAMPP
 
-- Trang chủ, cửa hàng, giới thiệu và chi tiết sản phẩm.
-- Tìm kiếm theo tên/nhãn hàng, lọc danh mục hoặc chó/mèo, sắp xếp theo giá.
-- Đánh dấu yêu thích bằng localStorage (ghi nhớ trên trình duyệt).
-- Giỏ hàng PHP session: thêm, chỉnh số lượng, xóa sản phẩm.
-- Đặt hàng COD, kiểm tra thông tin nhận hàng, tính tổng tiền phía máy chủ.
-- Giao hàng 30.000 đ; miễn phí từ 399.000 đ.
-- Lưu đơn cục bộ, xác nhận mã đơn và xóa giỏ sau khi lưu thành công.
-- CSRF token, escape nội dung HTML và khóa file khi ghi đơn.
+1. Chép thư mục dự án vào `C:\xampp\htdocs\ThuCung`.
+2. Bật **Apache** và **MySQL** trong XAMPP Control Panel.
+3. Vào phpMyAdmin, tạo database `mochi_pet` với `utf8mb4_unicode_ci`. Chọn database này → **Import** → tải `database/schema.sql`.
+4. Sao chép `config/database.example.php` thành `config/database.php`. XAMPP mặc định dùng `host=127.0.0.1`, `name=mochi_pet`, `user=root`, `password=''`; nếu máy bạn đã đặt mật khẩu MySQL thì điền mật khẩu thực tế vào file riêng này.
+5. Đặt `setup_token` thành một chuỗi ngẫu nhiên ít nhất 24 ký tự (khuyến nghị 32–64 ký tự từ trình quản lý mật khẩu). Giữ riêng; không commit hoặc gửi lên chat.
+6. Mở `http://localhost/ThuCung/setup.php`, nhập mã vừa đặt, tên/email và mật khẩu admin mới (ít nhất 10 ký tự).
+7. Khi thành công, xóa giá trị `setup_token` hoặc xóa `setup.php`. Trang setup tự khóa trong database ngay sau lần tạo đầu tiên.
+8. Mở `http://localhost/ThuCung/`; đăng nhập ở `auth.php`, quản trị ở `admin.php`.
 
-Đây là bản chạy cục bộ cho dự án học tập. Sản phẩm, nhãn hàng, giá, ngôi sao và ảnh minh họa là dữ liệu mẫu; chưa tích hợp thanh toán, vận chuyển, đánh giá thật hoặc quản trị đơn hàng mới.
+Không có tài khoản hoặc mật khẩu admin mặc định trong SQL/GitHub.
 
-## Cấu trúc
+## InfinityFree — các bước bắt buộc
 
-- `index.php`: điểm vào ứng dụng.
-- `Controller/StoreController.php`: session, giỏ hàng, kiểm tra form, đặt hàng.
-- `Model/PetCatalog.php`: dữ liệu mẫu, tra cứu sản phẩm và định dạng.
-- `Model/OrderStore.php`: ghi đơn hàng có khóa file.
-- `View/Store.php`: giao diện cửa hàng và các trang.
-- `assets/style.css`, `assets/app.js`: giao diện responsive và tương tác.
-- `assets/images/`: ảnh hero được tạo riêng và minh họa SVG.
-- `assets/fonts/`: Be Vietnam Pro và giấy phép OFL.
-- `storage/orders.php`: đơn cục bộ, được tạo sau lần đặt hàng đầu tiên, không đưa vào Git.
+1. Trong Control Panel, mở **MySQL Databases** và tạo một database.
+2. Ghi nhận **MySQL Hostname**, **Database Name**, **Username** và mật khẩu MySQL theo tài khoản hosting. Host trên InfinityFree thường có dạng `sqlXXX.infinityfree.com`; **không dùng localhost/127.0.0.1/root** như XAMPP. Dùng chính xác các giá trị bảng điều khiển cung cấp, gồm tiền tố tài khoản trong tên database.
+3. Mở phpMyAdmin từ database đó, chọn đúng database → **Import** → `database/schema.sql`. File không có `CREATE DATABASE`/`USE`, phù hợp quyền shared hosting. Import vào database trống; nếu có dữ liệu cũ, sao lưu và kiểm tra trước.
+4. Tải nội dung dự án vào **htdocs của tên miền đang dùng**, để `index.php` nằm ngay trong `htdocs`. Giữ các thư mục Controller, Model, View, config, assets, Upload, database cùng cấp. File Manager hoặc FTP đều dùng được.
+5. Tạo file `htdocs/config/database.php` từ file example và điền cấu hình hosting:
 
-Sửa tên/giá/mô tả sản phẩm tại `Model/PetCatalog.php`. Thay ảnh minh họa tại `assets/images/` và cập nhật trường `image` tương ứng. Đổi màu chủ đạo trong `:root` ở `assets/style.css`.
+   ```php
+   <?php
+   return [
+       'host' => 'MYSQL_HOSTNAME_TRONG_CONTROL_PANEL',
+       'port' => 3306,
+       'name' => 'TEN_DATABASE_DAY_DU_CO_TIEN_TO',
+       'user' => 'MYSQL_USERNAME',
+       'password' => 'MAT_KHAU_MYSQL_CUA_BAN',
+       'socket' => null,
+       'setup_token' => 'CHUOI_NGAU_NHIEN_RIENG_CUA_BAN_IT_NHAT_24_KY_TU',
+   ];
+   ```
 
-## Đọc đơn cục bộ
+   Đây là chỗ để bạn điền giá trị riêng trên hosting, không phải thông tin đăng nhập thật. File `config/database.php` được Git bỏ qua. Không tải cấu hình socket của môi trường cloud lên InfinityFree.
 
-Mỗi dòng chú thích trong `storage/orders.php` chứa một đơn JSON mã hóa Base64; mã hóa này là cách lưu dữ liệu, không phải mã hóa bảo mật. Dùng `php tools/read-orders.php` trên máy chủ để đọc. Trên Windows có thể chạy `C:\xampp\php\php.exe tools\read-orders.php` từ thư mục dự án. Không mở quyền truy cập HTTP cho thư mục storage. File `.htaccess` đi kèm chặn truy cập trên Apache; file dữ liệu `.php` cũng không xuất nội dung khi thực thi.
+6. Mở `https://ten-mien-cua-ban/setup.php`, tạo admin bằng mã thiết lập và email/mật khẩu bạn chọn. Xóa setup.php hoặc bỏ trống setup_token sau khi hoàn tất.
+7. Mở `https://ten-mien-cua-ban/auth.php` để đăng nhập. Admin vào `admin.php`; khách vào trang tài khoản.
+8. Thử đăng ký khách → thêm sản phẩm → đặt COD → kiểm tra đơn trong admin → đổi trạng thái. Tải một ảnh sản phẩm để kiểm tra quyền ghi `Upload/`.
 
-## Mã nguồn MVC cũ
+Thông thường thư mục `755`, file `644`; không cần quyền `777`. Giữ các file `.htaccess`. `Upload/` cần ghi được nếu dùng tính năng tải ảnh. Kiểm tra bản PHP hosting là 8.0+ và bật HTTPS theo hướng dẫn SSL của InfinityFree. Không cần terminal hoặc SSH trên hosting.
 
-Các file `Model/Connect.php`, `Model/Model.php`, `Controller/Controller.php` và các trang quản trị/đăng nhập trong `View/` được giữ để tham khảo cấu trúc dự án gốc; đã đổi tên hiển thị sang Mochi Pet. `View/Info.php` và `View/chitietsanpham.php` chuyển đến cửa hàng mới; `View/select.php` chuyển đến trang quản trị để thay phần bị lỗi cú pháp trong ZIP gốc.
+## Cấu trúc MVC
 
-Phần quản trị cũ yêu cầu database `webphp` với các bảng `ngockhanhsport`, `donhang`, `user`. ZIP nguồn không có schema/database nên phần này chưa được kiểm thử chức năng hoặc nối vào danh mục/đơn hàng mới. Các form xác thực/upload cũ chưa được gia cố để triển khai công khai; không dùng làm hệ thống quản trị production. Không cần truy cập phần này để dùng cửa hàng mới.
+- `index.php`, `auth.php`, `admin.php`: các điểm vào ứng dụng.
+- `Controller/Bootstrap.php`: session, CSRF, phân quyền, phản hồi lỗi cấu hình.
+- `Controller/StoreController.php`: giỏ hàng, đặt đơn, tài khoản.
+- `Controller/AuthController.php`: đăng ký/đăng nhập/đăng xuất.
+- `Controller/AdminController.php`: quản trị và kiểm tra upload.
+- `Model/Database.php`: kết nối PDO tập trung.
+- `Model/PetCatalog.php`, `Cart.php`, `OrderStore.php`: dữ liệu và giao dịch MySQL.
+- `View/Store.php`, `Account.php`, `Auth.php`, `Admin.php`: giao diện.
+- `database/schema.sql`: schema và 8 sản phẩm khởi tạo. Không chứa tài khoản admin.
+- `assets/pet-club.css`: nhận diện mới; `style.css` là bố cục/tương tác dùng chung, `admin.css` là quản trị.
+- `config/database.example.php`: mẫu cấu hình; `config/database.php` là file riêng không commit.
 
-## Kiểm tra đã thực hiện
+Các đường dẫn View/Controller cũ chuyển sang ứng dụng mới; không còn form xác thực plaintext hoặc thao tác xóa qua GET từ mã nguồn gốc. Các ảnh thể thao trong Upload được giữ từ ZIP nguồn, không dùng trong danh mục pet mặc định.
 
-Chạy trên PHP 8.4 CLI và Chromium: kiểm tra cú pháp PHP, desktop/mobile, tìm kiếm, lọc, sắp xếp, yêu thích, chi tiết, giỏ hàng, phí giao hàng, lưu đơn COD, CSRF, không lộ dữ liệu đơn qua HTTP, trạng thái 404 và lỗi tài nguyên/JavaScript. Chưa chạy trực tiếp bản XAMPP trên Windows; hướng dẫn trên dùng Apache/PHP chuẩn tương thích XAMPP.
+`storage/orders.php` của bản cũ không còn được đọc/ghi. Nếu bạn có đơn cũ trong file này, hãy giữ bản sao riêng để đối chiếu; bản này không tự nhập chúng hoặc xóa dữ liệu đó. Không thay đè `config/database.php` và các ảnh `Upload/pet-*` khi cập nhật mã nguồn.
+
+## Kiểm tra và phát triển
+
+Đã chạy trên PHP 8.4 + MariaDB 11.8 + Chromium: luồng đăng ký/đăng nhập, gộp giỏ, đặt đơn, giá máy chủ, snapshot sản phẩm, chống gửi trùng, rollback khi thiếu hàng, hoàn kho khi hủy, phân quyền, CSRF, CRUD sản phẩm/danh mục, upload ảnh và responsive/navbar desktop/mobile. Chưa triển khai trực tiếp vào tài khoản InfinityFree của bạn; cần điền cấu hình riêng ở trên.
+
+Có test giao dịch MySQL tại `tests/mysql.php`. Tạo **database riêng có tên kết thúc `_test`**, import schema vào đó và dùng một file cấu hình riêng qua `MOCHI_CONFIG_FILE`. Test từ chối chạy trên database không có hậu tố này:
+
+```sh
+MOCHI_CONFIG_FILE=/duong-dan/config-test.php php tests/mysql.php
+```
+
+Windows PowerShell:
+
+```powershell
+$env:MOCHI_CONFIG_FILE = 'C:\duong-dan\config-test.php'
+C:\xampp\php\php.exe tests\mysql.php
+```
+
+Test tạo/xóa fixture của nó; không sử dụng database production. `php tools/read-orders.php` đọc đơn từ CLI; không trả dữ liệu khách hàng qua HTTP.
+
+Các file `tools/cloud-setup.sh` và `tools/cloud-start.sh` chỉ dành cho môi trường Codex Debian, không cần chạy trên XAMPP/InfinityFree. Chúng sử dụng checkout hiện có; không tạo Git worktree.
+
+## Phạm vi
+
+Thanh toán hiện là COD; chưa tích hợp cổng thanh toán, hãng vận chuyển hay gửi email tự động. Yêu thích lưu trên trình duyệt. Danh mục/sản phẩm/giá và hình minh họa trong SQL là dữ liệu khởi tạo; có thể thay toàn bộ bằng quản trị. Bản này không cung cấp đánh giá khách hàng giả, không cần khóa API để chạy các chức năng đã liệt kê.

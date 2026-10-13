@@ -1,9 +1,4 @@
 <?php
-session_start();
-// Xóa session
-session_unset();
-session_destroy();
-// Quay lại trang đăng nhập
-header("Location: login.php");
-exit();
-?>
+// Đăng xuất chỉ qua POST có CSRF trên trang tài khoản.
+header('Location: ../index.php?page=account', true, 303);
+exit;

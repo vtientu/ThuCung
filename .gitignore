@@ -1,3 +1,5 @@
 /storage/*
 !/storage/.htaccess
 !/storage/.gitkeep
+/config/database.php
+/Upload/pet-*
