@@ -66,6 +66,14 @@ function database_error(Throwable $error): void
 {
     error_log('Mochi Pet database error: ' . $error->getMessage());
     http_response_code(503);
-    echo '<!doctype html><html lang="vi"><meta charset="utf-8"><meta name="viewport" content="width=device-width, initial-scale=1"><title>Mochi Pet · Cấu hình dữ liệu</title><body style="background:#fbf8f2;color:#343d32;font:16px Arial;padding:10%;line-height:1.8"><h1>Mochi chưa kết nối được dữ liệu</h1><p>Kiểm tra cấu hình MySQL trong <strong>config/database.php</strong> và quyền tạo bảng của tài khoản database. Web sẽ tự tạo bảng/seed ở lần truy cập đầu. Có thể nhập <strong>database/schema.sql</strong> bằng phpMyAdmin.</p><p>Bật MySQL trong XAMPP và kiểm tra database mochi_pet. Đọc README để cấu hình local. Không có đơn hàng nào được báo thành công khi chưa lưu vào MySQL.</p></body></html>';
+    $code = $error instanceof PDOException ? (int) ($error->errorInfo[1] ?? 0) : 0;
+    $hint = match ($code) {
+        1049 => 'Database chưa tồn tại. Kiểm tra tên database; với MySQL local, bật auto_setup để web tự tạo database.',
+        1044, 1142 => 'Tài khoản MySQL chưa có đủ quyền. Cần quyền tạo database/bảng và đọc, ghi dữ liệu; hoặc nhờ quản trị viên import database/schema.sql.',
+        1045 => 'MySQL từ chối tài khoản hoặc mật khẩu. Kiểm tra user và password trong config/database.php.',
+        2002, 2003 => 'Không kết nối được máy chủ MySQL. Bật MySQL trong XAMPP và kiểm tra host, port trong cấu hình.',
+        default => 'Kiểm tra cấu hình MySQL và xem dòng Mochi Pet database error trong Apache → Logs → error.log để biết nguyên nhân cụ thể.',
+    };
+    echo '<!doctype html><html lang="vi"><meta charset="utf-8"><meta name="viewport" content="width=device-width, initial-scale=1"><title>Mochi Pet · Cấu hình dữ liệu</title><body style="background:#fbf8f2;color:#343d32;font:16px Arial;padding:10%;line-height:1.8"><h1>Mochi chưa kết nối được dữ liệu</h1><p>' . htmlspecialchars($hint, ENT_QUOTES, 'UTF-8') . '</p><p>Web tự tạo database local, bảng và dữ liệu mẫu khi auto_setup bật. Đọc README để cấu hình máy dùng mật khẩu hoặc port riêng.</p></body></html>';
     exit();
 }

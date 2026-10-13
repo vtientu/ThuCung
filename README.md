@@ -8,9 +8,9 @@ Yêu cầu **XAMPP với PHP 8.0+**, PDO MySQL và MySQL/MariaDB. Không cần N
 
 1. Chép dự án vào `C:\xampp\htdocs\ThuCung`.
 2. Bật **Apache** và **MySQL** trong XAMPP Control Panel.
-3. Vào phpMyAdmin và tạo database `mochi_pet`, charset `utf8mb4_unicode_ci`.
-4. Sao chép `config/database.example.php` thành `config/database.php`. Mặc định là `127.0.0.1:3306`, database `mochi_pet`, username `root`, password rỗng. Nếu máy bạn đã đặt mật khẩu/port MySQL, sửa file này cho đúng.
-5. Đặt `setup_token` thành một chuỗi ngẫu nhiên dài ít nhất 24 ký tự trong cấu hình riêng.
+3. Mở `http://localhost/ThuCung/`. Với XAMPP mặc định, web tự tạo database `mochi_pet`, bảng và dữ liệu mẫu; không cần cấu hình hay import SQL.
+4. Chỉ khi máy bạn đã đặt mật khẩu/port MySQL khác mặc định: sao chép `config/database.example.php` thành `config/database.php` rồi sửa thông tin kết nối. Mặc định là `127.0.0.1:3306`, username `root`, password rỗng.
+5. Để tạo tài khoản quản trị, sao chép file cấu hình nếu chưa có và đặt `setup_token` thành một chuỗi ngẫu nhiên dài ít nhất 24 ký tự trong cấu hình riêng.
 6. Mở `http://localhost/ThuCung/`. Web tự tạo **8 bảng, 5 danh mục và 8 sản phẩm** ở lần truy cập đầu, không cần import SQL.
 7. Mở `http://localhost/ThuCung/setup.php`, nhập mã thiết lập và tạo admin với email/mật khẩu bạn chọn. Xóa giá trị `setup_token` sau khi tạo; trang thiết lập tự khóa trong DB.
 8. Đăng nhập tại `auth.php`, quản trị tại `admin.php`.
@@ -49,6 +49,8 @@ Chỉnh sản phẩm và danh mục qua **admin**, không cần sửa mã PHP. C
 ## Auto seed
 
 `auto_setup` mặc định bật. Lần kết nối đầu chạy `database/schema.sql`, sau đó lưu `settings.schema_version=1`. Những lần tải trang tiếp theo không seed lại hoặc khôi phục sản phẩm bạn đã xóa.
+
+Nếu database chưa tồn tại (MySQL 1049), ứng dụng tự tạo database khi dùng host local hoặc Unix socket. Tài khoản MySQL cần quyền CREATE; XAMPP mặc định dùng root có quyền này. Với host từ xa hoặc `auto_setup => false`, hãy tạo database thủ công.
 
 Khởi tạo dùng `CREATE TABLE IF NOT EXISTS` và `INSERT IGNORE`, không DROP/TRUNCATE hoặc ghi đè các dòng đã có. Khóa MySQL tránh hai lượt truy cập đầu cùng khởi tạo. Nếu DB Mochi cũ chưa có dấu phiên bản, lượt cập nhật đầu có thể thêm các dòng mẫu còn thiếu, nhưng giữ tên/giá/tồn kho, tài khoản và đơn đã tồn tại. Đây không phải công cụ chuyển đổi schema của dự án khác.
 
