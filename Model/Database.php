@@ -22,7 +22,11 @@ function db(): PDO
             'mysql:' . $endpoint . ';dbname=' . $config['name'] . ';charset=utf8mb4',
             $config['user'],
             $config['password'],
-            [PDO::ATTR_ERRMODE => PDO::ERRMODE_EXCEPTION, PDO::ATTR_DEFAULT_FETCH_MODE => PDO::FETCH_ASSOC, PDO::ATTR_EMULATE_PREPARES => false]
+            [
+                PDO::ATTR_ERRMODE => PDO::ERRMODE_EXCEPTION,
+                PDO::ATTR_DEFAULT_FETCH_MODE => PDO::FETCH_ASSOC,
+                PDO::ATTR_EMULATE_PREPARES => false,
+            ],
         );
         $newConnection->exec("SET time_zone = '+07:00'");
         initialize_database($newConnection, $config);

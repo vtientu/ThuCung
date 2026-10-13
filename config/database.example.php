@@ -1,6 +1,6 @@
 <?php
 // Sao chép thành database.php (file này được bỏ qua bởi Git).
-// InfinityFree: lấy chính xác host, database, username trong MySQL Databases.
+// Cấu hình mặc định cho MySQL trong XAMPP local.
 return [
     'host' => '127.0.0.1',
     'port' => 3306,

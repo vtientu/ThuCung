@@ -1,4 +1,129 @@
-<section class="container section account-section"><div class="section-heading"><div><span class="eyebrow">YOUR LITTLE PET CLUB</span><h1>Xin chào, <?= h($user['name']) ?>!</h1></div><div class="account-actions"><?php if($user['role']==='admin'): ?><a class="button small" href="admin.php">Quản trị cửa hàng ↗</a><?php endif; ?><form action="auth.php" method="post"><?php csrf(); ?><input type="hidden" name="action" value="logout"><button class="text-link logout-link">Đăng xuất</button></form></div></div>
-<?php if($accountError): ?><p class="form-error" role="alert"><?= h($accountError) ?></p><?php endif; ?>
-<div class="account-grid"><div class="checkout-card"><h2>Thông tin của bạn</h2><p class="muted"><?= h($user['email']) ?></p><form method="post" class="checkout-form"><?php csrf(); ?><input type="hidden" name="action" value="profile"><label>Họ và tên<input name="name" maxlength="100" required value="<?= h($_POST['name']??$user['name']) ?>"></label><label>Số điện thoại<input type="tel" name="phone" value="<?= h($_POST['phone']??$user['phone']) ?>"></label><label>Địa chỉ<textarea name="address" maxlength="500"><?= h($_POST['address']??$user['address']) ?></textarea></label><button class="button">Lưu thông tin →</button></form><details><summary>Đổi mật khẩu</summary><form method="post" class="checkout-form"><?php csrf(); ?><input type="hidden" name="action" value="password"><label>Mật khẩu hiện tại<input type="password" name="current_password" autocomplete="current-password" required></label><label>Mật khẩu mới<input type="password" name="password" autocomplete="new-password" minlength="10" maxlength="72" required></label><label>Xác nhận mật khẩu mới<input type="password" name="confirm_password" minlength="10" maxlength="72" required></label><button class="button">Đổi mật khẩu</button></form></details></div>
-<div class="account-orders"><h2>Những món quà đã chọn</h2><?php $myOrders=query_db('SELECT * FROM orders WHERE user_id=? ORDER BY id DESC',[$user['id']])->fetchAll(); foreach($myOrders as $order): ?><article class="customer-order"><div class="order-heading"><strong><?= h($order['code']) ?></strong><span class="status-pill"><?= h(order_statuses()[$order['status']]) ?></span></div><p><?= h($order['created_at']) ?> · <?= money($order['total']) ?> · COD</p><details><summary>Chi tiết đơn hàng</summary><?php foreach(query_db('SELECT * FROM order_items WHERE order_id=?',[$order['id']])->fetchAll() as $item): ?><p><?= h($item['name']) ?> × <?= $item['quantity'] ?> <strong><?= money($item['price']*$item['quantity']) ?></strong></p><?php endforeach; ?><p>Giao hàng <?= money($order['shipping']) ?></p><p><?= h($order['name']) ?> · <?= h($order['phone']) ?><br><?= h($order['address']) ?></p></details></article><?php endforeach; if(!$myOrders): ?><div class="empty-state"><h3>Chưa có đơn hàng nào</h3><p>Một món quà nhỏ đang chờ bé.</p><a class="button" href="index.php?page=shop">Khám phá cửa hàng →</a></div><?php endif; ?></div></div></section>
+<section class="container section account-section">
+    <div class="section-heading">
+        <div>
+            <span class="eyebrow">YOUR LITTLE PET CLUB</span>
+            <h1>Xin chào, <?= h($user['name']) ?>!</h1>
+        </div>
+        <div class="account-actions">
+            <?php if (
+    $user['role'] === 'admin'
+): ?>
+            <a class="button small" href="admin.php">Quản trị cửa hàng ↗</a>
+            <?php endif; ?>
+            <form action="auth.php" method="post">
+                <?php csrf(); ?>
+                <input type="hidden" name="action" value="logout" />
+                <button class="text-link logout-link">Đăng xuất</button>
+            </form>
+        </div>
+    </div>
+    <?php if ($accountError): ?>
+    <p class="form-error" role="alert"><?= h($accountError) ?></p>
+    <?php endif; ?>
+    <div class="account-grid">
+        <div class="checkout-card">
+            <h2>Thông tin của bạn</h2>
+            <p class="muted"><?= h($user['email']) ?></p>
+            <form method="post" class="checkout-form">
+                <?php csrf(); ?>
+                <input type="hidden" name="action" value="profile" />
+                <label>
+                    Họ và tên
+                    <input name="name" maxlength="100" required value="<?= h($_POST['name'] ?? $user['name']) ?>" />
+                </label>
+                <label>
+                    Số điện thoại
+                    <input type="tel" name="phone" value="<?= h($_POST['phone'] ?? $user['phone']) ?>" />
+                </label>
+                <label>
+                    Địa chỉ
+                    <textarea name="address" maxlength="500"><?= h($_POST['address'] ?? $user['address']) ?></textarea>
+                </label>
+                <button class="button">Lưu thông tin →</button>
+            </form>
+            <details>
+                <summary>Đổi mật khẩu</summary>
+                <form method="post" class="checkout-form">
+                    <?php csrf(); ?>
+                    <input type="hidden" name="action" value="password" />
+                    <label>
+                        Mật khẩu hiện tại
+                        <input
+                            type="password"
+                            name="current_password"
+                            autocomplete="current-password"
+                            required
+                        />
+                    </label>
+                    <label>
+                        Mật khẩu mới
+                        <input
+                            type="password"
+                            name="password"
+                            autocomplete="new-password"
+                            minlength="10"
+                            maxlength="72"
+                            required
+                        />
+                    </label>
+                    <label>
+                        Xác nhận mật khẩu mới
+                        <input
+                            type="password"
+                            name="confirm_password"
+                            minlength="10"
+                            maxlength="72"
+                            required
+                        />
+                    </label>
+                    <button class="button">Đổi mật khẩu</button>
+                </form>
+            </details>
+        </div>
+        <div class="account-orders">
+            <h2>Những món quà đã chọn</h2>
+            <?php
+$myOrders = customer_orders((int) $user['id']);
+foreach (
+    $myOrders
+    as $order
+): ?>
+            <article class="customer-order">
+                <div class="order-heading">
+                    <strong><?= h($order['code']) ?></strong>
+                    <span class="status-pill"><?= h(order_statuses()[$order['status']]) ?></span>
+                </div>
+                <p><?= h($order['created_at']) ?> · <?= money($order['total']) ?> · COD</p>
+                <details>
+                    <summary>Chi tiết đơn hàng</summary>
+                    <?php foreach (
+     $order['items']
+     as $item
+ ): ?>
+                    <p>
+                        <?= h($item['name']) ?> × <?= $item['quantity'] ?>
+                        <strong><?= money($item['price'] * $item['quantity']) ?></strong>
+                    </p>
+                    <?php endforeach; ?>
+                    <p>Giao hàng <?= money($order['shipping']) ?></p>
+                    <p>
+                        <?= h($order['name']) ?> · <?= h($order['phone']) ?>
+                        <br />
+                        <?= h($order['address']) ?>
+                    </p>
+                </details>
+            </article>
+            <?php endforeach;
+if (
+    !$myOrders
+): ?>
+            <div class="empty-state">
+                <h3>Chưa có đơn hàng nào</h3>
+                <p>Một món quà nhỏ đang chờ bé.</p>
+                <a class="button" href="index.php?page=shop">Khám phá cửa hàng →</a>
+            </div>
+            <?php endif;
+?>
+        </div>
+    </div>
+</section>

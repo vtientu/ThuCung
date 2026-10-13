@@ -1,5 +1,49 @@
 <footer class="footer concept-footer">
-    <div class="container footer-topline"><a class="footer-wordmark" href="index.php">mochi<span>pet.</span></a><p>Bốn chân nhỏ.<br>Một người bạn lớn.</p><a class="footer-cta" href="index.php?page=shop">Cưng bé ngay <?= icon('arrow') ?></a></div>
-    <div class="container footer-grid"><div><span class="eyebrow">A HOME FOR GOOD PET THINGS</span><p>Thiết kế có gu, chọn lựa có tâm.<br>Mochi dành cho bé và người thương bé.</p></div><div><h3>Shop theo team</h3><a href="index.php?page=shop&pet=dog">Team cún</a><a href="index.php?page=shop&pet=cat">Team mèo</a><a href="index.php?page=shop">Tất cả sản phẩm</a></div><div><h3>Mochi & bạn</h3><a href="index.php?page=about">Về Mochi</a><a href="<?= $user ? 'index.php?page=account' : 'auth.php' ?>">Tài khoản & đơn hàng</a><button class="footer-button" type="button" data-policy>Giao hàng & thanh toán</button></div><div class="footer-payment"><span>PAY WHEN IT ARRIVES.</span><strong>COD</strong><small>Thanh toán khi nhận hàng<br>Miễn phí giao hàng từ 399K</small></div></div>
-    <div class="container footer-bottom"><span>© <?= date('Y') ?> Mochi Pet · Đồ xinh cho bốn chân.</span><span>DESIGNED AROUND YOUR LITTLE ROOMMATE.</span></div>
+    <div class="container footer-topline">
+        <a class="footer-wordmark" href="index.php">
+            mochi
+            <span>pet.</span>
+        </a>
+        <p>
+            Bốn chân nhỏ.
+            <br />
+            Một người bạn lớn.
+        </p>
+        <a class="footer-cta" href="index.php?page=shop">Cưng bé ngay <?= icon('arrow') ?></a>
+    </div>
+    <div class="container footer-grid">
+        <div>
+            <span class="eyebrow">A HOME FOR GOOD PET THINGS</span>
+            <p>
+                Thiết kế có gu, chọn lựa có tâm.
+                <br />
+                Mochi dành cho bé và người thương bé.
+            </p>
+        </div>
+        <div>
+            <h3>Shop theo team</h3>
+            <a href="index.php?page=shop&pet=dog">Team cún</a>
+            <a href="index.php?page=shop&pet=cat">Team mèo</a>
+            <a href="index.php?page=shop">Tất cả sản phẩm</a>
+        </div>
+        <div>
+            <h3>Mochi & bạn</h3>
+            <a href="index.php?page=about">Về Mochi</a>
+            <a href="<?= $user ? 'index.php?page=account' : 'auth.php' ?>">Tài khoản & đơn hàng</a>
+            <button class="footer-button" type="button" data-policy>Giao hàng & thanh toán</button>
+        </div>
+        <div class="footer-payment">
+            <span>PAY WHEN IT ARRIVES.</span>
+            <strong>COD</strong>
+            <small>
+                Thanh toán khi nhận hàng
+                <br />
+                Miễn phí giao hàng từ 399K
+            </small>
+        </div>
+    </div>
+    <div class="container footer-bottom">
+        <span>© <?= date('Y') ?> Mochi Pet · Đồ xinh cho bốn chân.</span>
+        <span>DESIGNED AROUND YOUR LITTLE ROOMMATE.</span>
+    </div>
 </footer>

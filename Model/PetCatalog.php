@@ -1,21 +1,20 @@
 <?php
 require_once __DIR__ . '/Database.php';
 
-function pet_products(): array
-{
-    return query_db('SELECT p.*, c.slug AS category FROM products p JOIN categories c ON c.id = p.category_id WHERE p.active = 1 AND c.active = 1 ORDER BY p.id')->fetchAll();
-}
-
 function pet_product(int $id, bool $lock = false): ?array
 {
-    $sql = 'SELECT p.*, c.slug AS category FROM products p JOIN categories c ON c.id = p.category_id WHERE p.id = ? AND p.active = 1 AND c.active = 1';
+    $sql =
+        'SELECT p.*, c.slug AS category FROM products p JOIN categories c ON c.id = p.category_id WHERE p.id = ? AND p.active = 1 AND c.active = 1';
     $product = query_db($sql . ($lock ? ' FOR UPDATE' : ''), [$id])->fetch();
     return $product ?: null;
 }
 
 function pet_categories(): array
 {
-    return query_db('SELECT * FROM categories WHERE active = 1 ORDER BY id')->fetchAll();
+    static $categories;
+    return $categories ??= query_db(
+        'SELECT * FROM categories WHERE active = 1 ORDER BY id',
+    )->fetchAll();
 }
 
 function category_labels(): array
@@ -56,9 +55,35 @@ function search_products(string $category, string $pet, string $search, string $
 {
     $where = ['p.active = 1', 'c.active = 1'];
     $parameters = [];
-    if ($category !== 'all') { $where[] = 'c.slug = ?'; $parameters[] = $category; }
-    if ($pet !== 'all') { $where[] = "(p.pet = ? OR p.pet = 'all')"; $parameters[] = $pet; }
-    if ($search !== '') { $where[] = '(p.name LIKE ? OR p.brand LIKE ?)'; $parameters[] = '%' . $search . '%'; $parameters[] = '%' . $search . '%'; }
-    $order = ['price-asc' => 'p.price ASC, p.id ASC', 'price-desc' => 'p.price DESC, p.id ASC'][$sort] ?? 'p.id ASC';
-    return query_db('SELECT p.*, c.slug AS category FROM products p JOIN categories c ON c.id=p.category_id WHERE ' . implode(' AND ', $where) . ' ORDER BY ' . $order, $parameters)->fetchAll();
+    if ($category !== 'all') {
+        $where[] = 'c.slug = ?';
+        $parameters[] = $category;
+    }
+    if ($pet !== 'all') {
+        $where[] = "(p.pet = ? OR p.pet = 'all')";
+        $parameters[] = $pet;
+    }
+    if ($search !== '') {
+        $where[] = '(p.name LIKE ? OR p.brand LIKE ?)';
+        $parameters[] = '%' . $search . '%';
+        $parameters[] = '%' . $search . '%';
+    }
+    $order =
+        ['price-asc' => 'p.price ASC, p.id ASC', 'price-desc' => 'p.price DESC, p.id ASC'][$sort] ??
+        'p.id ASC';
+    return query_db(
+        'SELECT p.*, c.slug AS category FROM products p JOIN categories c ON c.id=p.category_id WHERE ' .
+            implode(' AND ', $where) .
+            ' ORDER BY ' .
+            $order,
+        $parameters,
+    )->fetchAll();
+}
+
+function related_products(int $id): array
+{
+    return query_db(
+        'SELECT p.*, c.slug AS category FROM products p JOIN categories c ON c.id=p.category_id WHERE p.id<>? AND p.active=1 AND c.active=1 ORDER BY p.id LIMIT 4',
+        [$id],
+    )->fetchAll();
 }
