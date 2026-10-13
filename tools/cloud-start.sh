@@ -16,16 +16,15 @@ fi
 exists=$(LD_LIBRARY_PATH="$TASK_TOOLS/mariadb/usr/lib/x86_64-linux-gnu" "$TASK_TOOLS/mariadb/usr/bin/mariadb" --no-defaults --socket="$TASK_TOOLS/mysql.sock" -uroot -N -e "SELECT COUNT(*) FROM information_schema.SCHEMATA WHERE SCHEMA_NAME='mochi_pet'")
 if [ "$exists" = 0 ]; then
     LD_LIBRARY_PATH="$TASK_TOOLS/mariadb/usr/lib/x86_64-linux-gnu" "$TASK_TOOLS/mariadb/usr/bin/mariadb" --no-defaults --socket="$TASK_TOOLS/mysql.sock" -uroot -e 'CREATE DATABASE mochi_pet CHARACTER SET utf8mb4 COLLATE utf8mb4_unicode_ci'
-    LD_LIBRARY_PATH="$TASK_TOOLS/mariadb/usr/lib/x86_64-linux-gnu" "$TASK_TOOLS/mariadb/usr/bin/mariadb" --no-defaults --socket="$TASK_TOOLS/mysql.sock" -uroot mochi_pet < database/schema.sql
 fi
 if [ ! -f config/database.php ]; then
     "$TASK_TOOLS/php-cli" -r 'file_put_contents("config/database.php", "<?php\nreturn " . var_export(["host"=>"127.0.0.1","port"=>3306,"name"=>"mochi_pet","user"=>"root","password"=>"","socket"=>"/workspace/tools/mysql.sock","setup_token"=>bin2hex(random_bytes(24))],true) . ";\n");'
     chmod 600 config/database.php
 fi
-if ! curl --fail --silent --show-error http://127.0.0.1:8080/ -o "$TASK_TOOLS/store-ready.html" 2>/dev/null || ! rg -q 'Mochi Pet Club' "$TASK_TOOLS/store-ready.html"; then
+if ! curl --fail --silent --show-error http://127.0.0.1:8080/ -o "$TASK_TOOLS/store-ready.html" 2>/dev/null || ! rg -q 'Mochi Pet' "$TASK_TOOLS/store-ready.html"; then
     nohup "$TASK_TOOLS/php-cli" -S 127.0.0.1:8080 -t /workspace/ThuCung > "$TASK_TOOLS/php-server.log" 2>&1 &
     attempt=0
-    until curl --fail --silent http://127.0.0.1:8080/ -o "$TASK_TOOLS/store-ready.html" && rg -q 'Mochi Pet Club' "$TASK_TOOLS/store-ready.html"; do
+    until curl --fail --silent http://127.0.0.1:8080/ -o "$TASK_TOOLS/store-ready.html" && rg -q 'Mochi Pet' "$TASK_TOOLS/store-ready.html"; do
         attempt=$((attempt + 1))
         if [ "$attempt" -ge 10 ]; then echo 'PHP readiness failed; inspect /workspace/tools/php-server.log' >&2; exit 1; fi
         sleep 1

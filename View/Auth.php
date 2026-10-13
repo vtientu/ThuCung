@@ -1,6 +1,6 @@
 <!DOCTYPE html>
 <html lang="vi">
-<head><meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1"><title><?= $mode === 'register' ? 'Đăng ký' : 'Đăng nhập' ?> · Mochi Pet</title><link rel="stylesheet" href="assets/style.css"><link rel="stylesheet" href="assets/pet-club.css"><link rel="icon" href="assets/images/favicon.svg"></head>
+<head><meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1"><title><?= $mode === 'register' ? 'Đăng ký' : 'Đăng nhập' ?> · Mochi Pet</title><link rel="stylesheet" href="assets/style.css"><link rel="stylesheet" href="assets/concept-store.css"><link rel="icon" href="assets/images/favicon.svg"></head>
 <body class="auth-body">
 <main class="auth-layout">
     <div class="auth-art"><a href="index.php" class="logo">mochi<span class="logo-pet">pet</span><span class="logo-dot">.</span></a><h1>Những bàn chân nhỏ.<br>Tình yêu thật lớn.</h1><img src="assets/images/hero.png" alt="Những người bạn nhỏ của Mochi"><p>Một chút yêu thương, mỗi ngày.</p></div>

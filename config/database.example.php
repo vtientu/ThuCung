@@ -8,6 +8,8 @@ return [
     'user' => 'root',
     'password' => '',
     'socket' => null,
+    // Tạo bảng và seed một lần khi kết nối vào database trống.
+    'auto_setup' => true,
     // Đặt một chuỗi ngẫu nhiên dài >= 24 ký tự trước khi mở setup.php.
     // Sau khi tạo admin, xóa giá trị này. Không dùng mật khẩu mặc định.
     'setup_token' => '',

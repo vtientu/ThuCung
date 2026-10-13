@@ -1,4 +1,4 @@
--- Mochi Pet: chọn database trong phpMyAdmin rồi Import file này.
+-- Mochi Pet: web tự chạy schema/seed ở lần kết nối đầu. Có thể Import thủ công.
 -- Không có CREATE DATABASE/USE để tương thích tài khoản shared hosting InfinityFree.
 -- Import vào database trống. Không dùng file này để reset database đang có dữ liệu.
 SET NAMES utf8mb4;
@@ -92,3 +92,6 @@ INSERT IGNORE INTO products (id,category_id,name,brand,pet,price,`old`,image,col
 INSERT IGNORE INTO products (id,category_id,name,brand,pet,price,`old`,image,color,badge,description) VALUES (6,5,'Sữa tắm dịu nhẹ Oat','MOCHI CARE','all',145000,0,'shampoo','green','','Sữa tắm hương yến mạch nhẹ nhàng, chai 300 ml. Dành cho chó và mèo; tránh tiếp xúc với mắt và rửa sạch sau khi dùng.');
 INSERT IGNORE INTO products (id,category_id,name,brand,pet,price,`old`,image,color,badge,description) VALUES (7,3,'Cần câu lông vũ','MOCHI PLAY','cat',65000,0,'feather','pink','','Cần câu đồ chơi với lông vũ và chuông nhỏ. Cùng bé vận động và tạo thêm những khoảnh khắc vui vẻ.');
 INSERT IGNORE INTO products (id,category_id,name,brand,pet,price,`old`,image,color,badge,description) VALUES (8,1,'Snack thưởng cho cún','MOCHI NUTRITION','dog',79000,95000,'snack','yellow','-17%','Snack thưởng vị gà, túi 100 g. Dùng làm phần thưởng khi huấn luyện, bổ sung bên cạnh chế độ ăn chính.');
+
+-- Dấu mốc cuối cùng: không seed lại mỗi khi tải trang.
+INSERT IGNORE INTO settings (setting_key,setting_value) VALUES ('schema_version','1');
