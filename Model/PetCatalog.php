@@ -32,6 +32,19 @@ function product_image(array $product): string
     if (preg_match('/^pet-[a-f0-9]{32}\.(jpg|png|webp)$/', $image)) {
         return 'Upload/' . $image;
     }
+    $staticImages = [
+        'hat-dinh-duong-meo.png',
+        'bat-gom-pastel.png',
+        'do-choi-xuong-mem.png',
+        'vong-co.png',
+        'nem-cloud.png',
+        'sua-tam.png',
+        'can-cau-long-vu.png',
+        'snack-cun.png',
+    ];
+    if (in_array($image, $staticImages, true)) {
+        return 'assets/images/' . $image;
+    }
     $allowed = ['food', 'bowl', 'bone', 'collar', 'bed', 'shampoo', 'feather', 'snack'];
     return 'assets/images/' . (in_array($image, $allowed, true) ? $image : 'food') . '.svg';
 }

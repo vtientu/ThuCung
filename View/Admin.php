@@ -216,7 +216,12 @@ if ($edit && str_starts_with($edit['image'] ?? '', 'pet-')): ?>
                             <option value="<?= h($edit['image']) ?>">Giữ ảnh đã tải lên</option>
                             <?php endif;
 foreach (
-    ['food', 'bowl', 'bone', 'collar', 'bed', 'shampoo', 'feather', 'snack']
+    [
+        'food', 'bowl', 'bone', 'collar', 'bed', 'shampoo', 'feather', 'snack',
+        'hat-dinh-duong-meo.png', 'bat-gom-pastel.png', 'do-choi-xuong-mem.png',
+        'vong-co.png', 'nem-cloud.png', 'sua-tam.png', 'can-cau-long-vu.png',
+        'snack-cun.png',
+    ]
     as $image
 ): ?>
                             <option <?= ($edit['image'] ?? 'food') === $image ? 'selected' : '' ?>><?= $image ?></option>

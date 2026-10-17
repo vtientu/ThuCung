@@ -48,7 +48,7 @@ Chỉnh sản phẩm và danh mục qua **admin**, không cần sửa mã PHP. C
 
 ## Auto seed
 
-`auto_setup` mặc định bật. Lần kết nối đầu chạy `database/schema.sql`, sau đó lưu `settings.schema_version=1`. Những lần tải trang tiếp theo không seed lại hoặc khôi phục sản phẩm bạn đã xóa.
+`auto_setup` mặc định bật. Lần kết nối đầu chạy `database/schema.sql`, sau đó lưu `settings.schema_version=3`. Bản nâng cấp lên phiên bản 3 cập nhật tên ảnh của tám sản phẩm mẫu theo bộ ảnh trong `assets/images/`, đồng thời giữ nguyên các thông tin khác. Những lần tải trang tiếp theo không seed lại hoặc khôi phục sản phẩm bạn đã xóa.
 
 Nếu database chưa tồn tại (MySQL 1049), ứng dụng tự tạo database khi dùng host local hoặc Unix socket. Tài khoản MySQL cần quyền CREATE; XAMPP mặc định dùng root có quyền này. Với host từ xa hoặc `auto_setup => false`, hãy tạo database thủ công.
 

@@ -1,5 +1,5 @@
 <?php
-const MOCHI_SCHEMA_VERSION = 1;
+const MOCHI_SCHEMA_VERSION = 3;
 
 function installed_schema_version(PDO $connection): int
 {
@@ -112,9 +112,34 @@ function initialize_database(PDO $connection, array $config): void
         foreach (schema_statements($sql) as $statement) {
             $connection->exec($statement);
         }
+        // Update only image filenames for the eight seeded products.
+        $imageUpdates = [
+            1 => 'hat-dinh-duong-meo.png',
+            2 => 'bat-gom-pastel.png',
+            3 => 'do-choi-xuong-mem.png',
+            4 => 'vong-co.png',
+            5 => 'nem-cloud.png',
+            6 => 'sua-tam.png',
+            7 => 'can-cau-long-vu.png',
+            8 => 'snack-cun.png',
+        ];
+        $seededNames = [
+            1 => 'Hạt dinh dưỡng cho mèo',
+            2 => 'Bát ăn gốm Pastel',
+            3 => 'Đồ chơi xương mềm',
+            4 => 'Vòng cổ Everyday',
+            5 => 'Nệm êm Cloud Bed',
+            6 => 'Sữa tắm dịu nhẹ Oat',
+            7 => 'Cần câu lông vũ',
+            8 => 'Snack thưởng cho cún',
+        ];
+        $updateImage = $connection->prepare('UPDATE products SET image=? WHERE id=? AND name=?');
+        foreach ($imageUpdates as $productId => $image) {
+            $updateImage->execute([$image, $productId, $seededNames[$productId]]);
+        }
         // Đánh dấu chỉ sau khi mọi bảng và dữ liệu khởi tạo đã thành công.
         $connection->exec(
-            "UPDATE settings SET setting_value='1' WHERE setting_key='schema_version'",
+            "UPDATE settings SET setting_value='3' WHERE setting_key='schema_version'",
         );
     } finally {
         $release = $connection->prepare('SELECT RELEASE_LOCK(?)');

@@ -58,7 +58,12 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
             if (
                 !in_array(
                     $image,
-                    ['food', 'bowl', 'bone', 'collar', 'bed', 'shampoo', 'feather', 'snack'],
+                    [
+                        'food', 'bowl', 'bone', 'collar', 'bed', 'shampoo', 'feather', 'snack',
+                        'hat-dinh-duong-meo.png', 'bat-gom-pastel.png', 'do-choi-xuong-mem.png',
+                        'vong-co.png', 'nem-cloud.png', 'sua-tam.png', 'can-cau-long-vu.png',
+                        'snack-cun.png',
+                    ],
                     true,
                 )
             ) {
@@ -80,7 +85,11 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
                     );
                 }
                 $image = 'pet-' . bin2hex(random_bytes(16)) . '.' . $types[$info['mime']];
-                $newImage = __DIR__ . '/../Upload/' . $image;
+                $uploadDirectory = dirname(__DIR__) . DIRECTORY_SEPARATOR . 'Upload';
+                if (!is_dir($uploadDirectory) && !mkdir($uploadDirectory, 0755, true) && !is_dir($uploadDirectory)) {
+                    throw new DomainException('KhÃ´ng táº¡o Ä‘Æ°á»£c thÆ° má»¥c Upload/.');
+                }
+                $newImage = $uploadDirectory . DIRECTORY_SEPARATOR . $image;
                 if (!move_uploaded_file($file['tmp_name'], $newImage)) {
                     throw new DomainException('Không lưu được ảnh. Kiểm tra quyền ghi Upload/.');
                 }

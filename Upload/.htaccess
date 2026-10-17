@@ -1,4 +1,7 @@
 Options -Indexes
+<FilesMatch "\.(jpg|jpeg|png|webp)$">
+    Require all granted
+</FilesMatch>
 <FilesMatch "\.(php|phtml|phar|cgi|pl|html|svg)$">
     Require all denied
 </FilesMatch>
