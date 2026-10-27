@@ -1,3 +1,5 @@
 /config/database.php
 /Upload/pet-*
 /storage/
+
+/config/mail.local.php

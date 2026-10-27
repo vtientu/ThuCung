@@ -1,5 +1,5 @@
 <?php
-const MOCHI_SCHEMA_VERSION = 3;
+const MOCHI_SCHEMA_VERSION = 4;
 
 function installed_schema_version(PDO $connection): int
 {
@@ -112,6 +112,9 @@ function initialize_database(PDO $connection, array $config): void
         foreach (schema_statements($sql) as $statement) {
             $connection->exec($statement);
         }
+        if (!$connection->query("SHOW COLUMNS FROM orders LIKE 'email'")->fetch()) {
+            $connection->exec("ALTER TABLE orders ADD COLUMN email VARCHAR(254) NOT NULL DEFAULT ''");
+        }
         // Update only image filenames for the eight seeded products.
         $imageUpdates = [
             1 => 'hat-dinh-duong-meo.png',
@@ -139,7 +142,7 @@ function initialize_database(PDO $connection, array $config): void
         }
         // Đánh dấu chỉ sau khi mọi bảng và dữ liệu khởi tạo đã thành công.
         $connection->exec(
-            "UPDATE settings SET setting_value='3' WHERE setting_key='schema_version'",
+            "UPDATE settings SET setting_value='4' WHERE setting_key='schema_version'",
         );
     } finally {
         $release = $connection->prepare('SELECT RELEASE_LOCK(?)');

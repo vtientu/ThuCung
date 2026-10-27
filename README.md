@@ -77,3 +77,15 @@ C:\xampp\php\php.exe tests\install.php
 ```
 
 Với PHP CLI trên Linux/macOS: `MOCHI_CONFIG_FILE=/duong-dan/database-test.php php tests/mysql.php`.
+
+
+### Email xác nhận đơn hàng
+
+Checkout bắt buộc email và lưu email tại thời điểm đặt hàng. Chỉ đơn mới được gửi xác nhận sau khi commit; gửi lại request cùng token không gửi lại email. Email bao gồm mã đơn, người nhận, email, số điện thoại, địa chỉ, sản phẩm, phí và tổng thanh toán. Mộc Trà có thêm tùy chọn đồ uống và giảm giá; Mochi Pet dùng nội dung quà cho thú cưng.
+
+- Sao chép `config/mail.local.example.php` thành `config/mail.local.php`, nhập tài khoản SMTP, App Password và địa chỉ người gửi. File thật đã được gitignore. Mặc định chưa bật gửi khi chưa cấu hình.
+- Hoặc dùng biến môi trường riêng `MOCHI_MAIL_ENABLED=true`, `MOCHI_SMTP_HOST`, `MOCHI_SMTP_PORT`, `MOCHI_SMTP_ENCRYPTION` (`tls`/587 hoặc `ssl`/465), `MOCHI_SMTP_USERNAME`, `MOCHI_SMTP_PASSWORD`, `MOCHI_MAIL_FROM`. Hai dự án không đọc cấu hình của nhau.
+- PHP cần OpenSSL và CA certificate hợp lệ để xác minh TLS.
+- Database cũ: chạy một lần `database/migrations/20261027_order_email.sql` trên đúng database. Mochi Pet tự thêm cột khi `auto_setup` được bật; trường hợp đó không chạy migration thủ công nữa. Database mới dùng schema đã cập nhật.
+- Lỗi SMTP được ghi PHP error log theo ID đơn, không ghi thông tin khách/mật khẩu và không hủy đơn đã tạo. Hiện gửi đồng bộ, chưa có hàng đợi hay tự thử lại; cần kiểm tra log và xử lý thủ công nếu SMTP lỗi. SMTP chấp nhận thư chưa bảo đảm thư vào inbox.
+- Để kiểm tra gửi thật: cấu hình SMTP, tạo một đơn thử cho email bạn kiểm soát, kiểm tra nội dung và thử gửi lại request để xác nhận không tạo/gửi trùng. Không dùng mật khẩu đăng nhập Gmail thông thường.

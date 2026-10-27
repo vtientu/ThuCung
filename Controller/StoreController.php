@@ -22,6 +22,10 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
         } elseif ($action === 'update') {
             set_cart_quantity($id, max(0, (int) ($_POST['quantity'] ?? 0)));
         } elseif ($action === 'checkout') {
+            $email = trim((string) ($_POST['email'] ?? ''));
+            if (strlen($email) > 254 || !filter_var($email, FILTER_VALIDATE_EMAIL)) {
+                throw new DomainException('Vui lòng nhập email nhận xác nhận đơn hàng hợp lệ.');
+            }
             $name = trim($_POST['name'] ?? '');
             $phone = trim($_POST['phone'] ?? '');
             $address = trim($_POST['address'] ?? '');
@@ -40,7 +44,7 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
             if (!preg_match('/^[a-f0-9]{64}$/', $token)) {
                 throw new DomainException('Phiên đặt hàng không hợp lệ. Vui lòng tải lại trang.');
             }
-            $_SESSION['last_order'] = create_pet_order($name, $phone, $address, $token);
+            $_SESSION['last_order'] = create_pet_order($name, $phone, $address, $token, $email);
             $_SESSION['checkout_token'] = bin2hex(random_bytes(32));
             redirect_to('index.php?page=success');
         } elseif ($action === 'profile') {

@@ -45,6 +45,7 @@ try {
             '0901234567',
             '12 Đường Test, Thành phố Test',
             $_SESSION['checkout_token'],
+            'customer@example.test',
         );
     } catch (DomainException $error) {
         $blocked = true;
@@ -67,6 +68,7 @@ try {
         '0901234567',
         '12 Đường Test, Thành phố Test',
         $_SESSION['checkout_token'],
+            'customer@example.test',
     );
     check_test((int) $order['total'] === 230000, 'Server prices and shipping');
     check_test(
@@ -79,6 +81,7 @@ try {
         '0901234567',
         '12 Đường Test, Thành phố Test',
         $_SESSION['checkout_token'],
+            'customer@example.test',
     );
     check_test($again['id'] === $order['id'], 'Repeated checkout is idempotent');
     check_test(
@@ -149,6 +152,7 @@ try {
         '0901234567',
         '12 Đường Test, Thành phố Test',
         $_SESSION['checkout_token'],
+            'customer@example.test',
     );
     check_test(
         (int) $second['shipping'] === 0 && (int) $second['total'] === 400000,

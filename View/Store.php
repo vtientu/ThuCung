@@ -438,6 +438,11 @@ endforeach; ?>
                                 />
                             </label>
                             <label>
+                                Email nhận xác nhận đơn hàng
+                                <input type="email" name="email" autocomplete="email" required maxlength="254"
+                                    value="<?= h($_POST['email'] ?? ($user['email'] ?? '')) ?>" placeholder="ban@example.com" />
+                            </label>
+                            <label>
                                 Số điện thoại
                                 <input
                                     type="tel"

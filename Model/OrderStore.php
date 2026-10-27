@@ -1,4 +1,5 @@
 <?php
+require_once __DIR__ . "/OrderMailer.php";
 function order_statuses(): array
 {
     return [
@@ -10,7 +11,7 @@ function order_statuses(): array
     ];
 }
 
-function create_pet_order(string $name, string $phone, string $address, string $token): array
+function create_pet_order(string $name, string $phone, string $address, string $token, string $email): array
 {
     $connection = db();
     $connection->beginTransaction();
@@ -49,7 +50,7 @@ function create_pet_order(string $name, string $phone, string $address, string $
         $shipping = $subtotal >= 399000 ? 0 : 30000;
         $code = 'MP' . date('ymd') . strtoupper(bin2hex(random_bytes(5)));
         query_db(
-            'INSERT INTO orders (code, checkout_token, cart_key, user_id, name, phone, address, subtotal, shipping, total) VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?)',
+            'INSERT INTO orders (code, checkout_token, cart_key, user_id, name, phone, address, subtotal, shipping, total, email) VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)',
             [
                 $code,
                 $token,
@@ -61,6 +62,7 @@ function create_pet_order(string $name, string $phone, string $address, string $
                 $subtotal,
                 $shipping,
                 $subtotal + $shipping,
+                $email,
             ],
         );
         $orderId = (int) $connection->lastInsertId();
@@ -78,6 +80,7 @@ function create_pet_order(string $name, string $phone, string $address, string $
         query_db('DELETE FROM cart_items WHERE cart_key = ?', [cart_key()]);
         $order = query_db('SELECT * FROM orders WHERE id = ?', [$orderId])->fetch();
         $connection->commit();
+        send_pet_confirmation($order, $items);
         return $order;
     } catch (Throwable $error) {
         if ($connection->inTransaction()) {
